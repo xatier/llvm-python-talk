@@ -340,11 +340,13 @@ tailrecurse._crit_edge:
 }
 ```
 
-- Debugging information
-  - `clang -S -g -emit-llvm foo.c`
-  - `@llvm.dbg.declare`
-  - `@llvm.dbg.value`
-  - MDNode: metadata node
+---
+
+# Debugging information
+- `clang -S -g -emit-llvm foo.c`
+- `@llvm.dbg.declare`
+- `@llvm.dbg.value`
+- MDNode: metadata node
 
 ---
 
@@ -530,12 +532,13 @@ class: center, middle, inverse
 
 ---
 
+# variables versioning
 
 1 ![SSA 1](https://upload.wikimedia.org/wikipedia/commons/7/73/SSA_example1.1.png)
 2 ![SSA 2](https://upload.wikimedia.org/wikipedia/commons/f/f7/SSA_example1.2.png)
 3 ![SSA 3](https://upload.wikimedia.org/wikipedia/commons/8/84/SSA_example1.3.png)
 
-----
+---
 
 ### The phi instruction
 
@@ -608,7 +611,7 @@ define i32 @f(i32 %x, i32 %a, i32 %b) #0 {
 ```
 
 
-### Because of LLVM is in SSA form, lots optimizations could be easily applied to the IR.
+### Because LLVM is in SSA form, lots optimizations could be easily applied to the IR.
 
 ---
 
