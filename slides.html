@@ -130,7 +130,7 @@ LLVM stuffs
 
 
 
-### xatier @PYHUG .red[2015]  ###
+### xatier @PYHUG .red[Jun 15 2015]  ###
 
 ---
 
@@ -212,8 +212,9 @@ int add1 (int a, int b) {
 }
 
 int add2 (int a, int b) {
-    if (a == 0)
+    if (a == 0) {
         return b;
+    }
     else {
         return add2(a-1, b+1);
     }
@@ -233,7 +234,7 @@ int add2 (int a, int b) {
 - Function attributes
 - Memory allocation / Alignment
 - Load / Store architecture
-- Basic blocks / Predicates
+- Basic blocks / Predecessor
 
 ```
 ; ModuleID = 'foo.c'
@@ -252,6 +253,10 @@ define i32 @add1(i32 %a, i32 %b) #0 {
   ret i32 %5
 }
 ```
+
+.note[
+    `nsw`: No Unsigned Wrap
+]
 
 ---
 
@@ -293,8 +298,7 @@ define i32 @add2(i32 %a, i32 %b) #0 {
 
 - Module attributes
 - Linkage information
-- Metadata
-- Debugging information
+- Debugging information metadata
 
 
 ```
@@ -313,10 +317,9 @@ LLVM 3.6.0svn)"}
 
 # C code to LLVM IR
 
-- Optimization
+- Optimization ☺
   - `clang -S -O1 -emit-llvm foo.c`
 
-- ☺
 
 ```
 ; ModuleID = 'foo.c'
@@ -337,6 +340,12 @@ tailrecurse._crit_edge:
 }
 ```
 
+- Debugging information
+  - `clang -S -g -emit-llvm foo.c`
+  - `@llvm.dbg.declare`
+  - `@llvm.dbg.value`
+  - MDNode: metadata node
+
 ---
 
 # Play around with LLVM tools
@@ -352,6 +361,10 @@ tailrecurse._crit_edge:
 - `llvm-as`: llvm .ll -> .bc assembler
 
 - `llc`: llvm system compiler
+
+.center[
+    ![pic](http://i.imgur.com/8FQGYqs.jpg)
+]
 
 ---
 
@@ -386,19 +399,35 @@ The goal of the Clang project is to create a new C, C++, Objective C and Objecti
 
 ---
 
+class: center, middle
+
+.center[
+    ![pic](http://www.aosabook.org/images/llvm/LLVMCompiler1.png)
+]
+
+---
+
+class: center, middle
+
+.center[
+<img src="https://jonathan2251.github.io/lbd/_images/91.png" style="width: 100%" />
+]
+
+---
+
 # The clang compiler (front end)
 
-### compile like gcc
+#### compile like gcc
 
 - `clang hello.c -o hello`
 
-### compilie to assembly (native) codes
+#### compile to assembly (native) codes
 
 -  `clang -S hello.c`
 
-### compile source code to bitcode files / LLVM assembly
+#### compile source code to bitcode / human readable forms
 
-#### The `-emit-llvm` option
+##### The `-emit-llvm` option
 
 - `clang -c -emit-llvm hello.c -o hello.bc`
 - `clang -S -emit-llvm hello.c -o hello.ll`
@@ -406,32 +435,228 @@ The goal of the Clang project is to create a new C, C++, Objective C and Objecti
 
 ---
 
-  - `lli` the LLVM JIT tool (llvm interpreter & dynamic compiler)
-    - `lli hello.bc`
-  - `llvm-dis` traslate bitcode form to llvm IR (.bc -> .ll disassembler)
-    - `llvm-dis < hello.bc`
-  - `llvm-as` translate llvm IR form to bitcode form (.ll -> .bc assembler)
-    - `llvm-as hello.ll`
-  - `llc` translate bitcode form to native machine code (llvm system compiler)
-    - `llc hello.bc -o hello.s`
-    - `llc -march=arm hello.bc -o hello.s`
-    - `llc -march=mips hello.bc -o hello.s`
-    - `llc -march=x86 hello.bc -o hello.`s
-    - `llc -march=x86-64 hello.bc -o hello.s`
+# The LLVM tools (back end)
 
-- llvm IR features
-  - typed
-  - pesudo register
-  - metadata
-  - SSA form & phi node
+#### `lli` the LLVM JIT tool (llvm interpreter & dynamic compiler)
+
+- LLVM IR -> `llvm-as` -> bitcode form -> JIT compiler -> native code -> run
+- `lli hello.ll`
+- `lli hello.bc`
+
+#### `llvm-dis` translate bitcode form to llvm IR (.bc -> .ll disassembler)
+
+- `llvm-dis < hello.bc > hello.ll`
+
+#### `llvm-as` translate llvm IR form to bitcode form (.ll -> .bc assembler)
+
+- `llvm-as hello.ll`
 
 
-- LLVM Passes
-  - `$ opt-3.4 -help`
+#### Extract LLVM IR from bitcode form and pass to the llvm interpreter
 
-- a tiny ast +  llvmpy example
+- `llvm-dis < foo.bc | lli`
+
+---
+
+# llvm system compiler
+
+#### `llc` translate bitcode form to native machine code
+
+- bitcode form -> llvm backend passes -> native assembly
+
+- `llc hello.bc -o hello.s`
+
+#### Target selection
+
+- `llc -march=arm hello.bc -o hello.s`
+
+- `llc -march=mips hello.bc -o hello.s`
+
+- `llc -march=x86 hello.bc -o hello.s`
+
+- `llc -march=x86-64 hello.bc -o hello.s`
 
 
+### the assembly will be passed to the linker later on
+
+---
+
+# llvm IR features
+
+- typed
+- pesudo register
+- metadata
+- SSA form & phi node
+
+---
+
+# llvm IR features
+
+- typed
+- pesudo register
+- metadata
+## SSA form & phi node
+
+
+
+---
+
+## SSA form (from wiki)
+
+```
+In compiler design, static single assignment form (often abbreviated as SSA
+form or simply SSA) is a property of an intermediate representation (IR),
+which requires that each variable is assigned exactly once, and every variable
+is defined before it is used. Existing variables in the original IR are split
+into versions, new variables typically indicated by the original name with a
+subscript in textbooks, so that every definition gets its own version. In SSA
+form, use-def chains are explicit and each contains a single element.
+```
+
+---
+
+
+class: center, middle
+
+.center[
+<img src="http://i.imgur.com/hEVHi7U.jpg" style="width: 100%" />
+]
+
+---
+
+class: center, middle, inverse
+
+# variables versioning
+
+---
+
+
+1 ![SSA 1](https://upload.wikimedia.org/wikipedia/commons/7/73/SSA_example1.1.png)
+2 ![SSA 2](https://upload.wikimedia.org/wikipedia/commons/f/f7/SSA_example1.2.png)
+3 ![SSA 3](https://upload.wikimedia.org/wikipedia/commons/8/84/SSA_example1.3.png)
+
+----
+
+### The phi instruction
+
+The `phi` instruction is used to implement the φ node in the SSA graph representing the function.
+
+
+```
+Loop:       ; Infinite loop that counts from 0 on up...
+    %indvar = phi i32 [ 0, %LoopHeader ], [ %nextindvar, %Loop ]
+    %nextindvar = add i32 %indvar, 1
+
+    # loop body
+
+    br label %Loop
+```
+
+---
+
+- `clang -S -emit-llvm foo.c`
+- `opt -mem2reg foo.ll | llvm-dis`
+
+```
+int f (int x, int a, int b) {
+  int c;
+  if (x) {
+    c = a;
+  }
+  else {
+    c = b;
+  }
+  return c;
+}
+```
+
+----
+
+```
+; Function Attrs: nounwind uwtable
+define i32 @f(i32 %x, i32 %a, i32 %b) #0 {
+  %1 = icmp ne i32 %x, 0
+  br i1 %1, label %2, label %3
+
+; <label>:2                                       ; preds = %0
+  br label %4
+
+; <label>:3                                       ; preds = %0
+  br label %4
+
+; <label>:4                                       ; preds = %3, %2
+  %c.0 = phi i32 [ %a, %2 ], [ %b, %3 ]
+  ret i32 %c.0
+}
+```
+
+---
+
+## The select instruction
+
+The `select` instruction is used to choose one value based on a condition, without IR-level branching
+
+- `clang -S -emit-llvm foo.c`
+
+```
+; Function Attrs: nounwind readnone uwtable
+define i32 @f(i32 %x, i32 %a, i32 %b) #0 {
+  %1 = icmp eq i32 %x, 0
+  %b.a = select i1 %1, i32 %b, i32 %a
+  ret i32 %b.a
+}
+```
+
+
+### Because of LLVM is in SSA form, lots optimizations could be easily applied to the IR.
+
+---
+
+# LLVM Passes
+
+- Optimizations are implemented as Passes that traverse some portion of a program to either collect information or transform the program.
+
+```
+The LLVM Pass Framework is an important part of the LLVM system, because LLVM
+passes are where most of the interesting parts of the compiler exist. Passes
+perform the transformations and optimizations that make up the compiler, they
+build the analysis results that are used by these transformations, and they
+are, above all, a structuring technique for compiler code.
+```
+
+- Pass class
+  + ModulePass, FunctionPass, LoopPass, BasicBlockPass, ...
+
+- PassManager: LLVM pass scheduler
+  - dependency analysis
+  - share analysis results
+  - pipeline the execution of passes
+
+- `$ opt-3.4 -help`
+
+
+.note[
+    http://llvm.org/docs/WritingAnLLVMPass.html
+    http://llvm.org/docs/doxygen/html/classllvm_1_1Pass.html
+]
+
+---
+
+
+class: center, middle
+
+.center[
+<img src="http://llvm.org/docs/doxygen/html/classllvm_1_1Pass__inherit__graph.png" style="width: 73%" />
+]
+
+---
+
+# a tiny ast +  llvmpy example
+
+## demo
+
+
+---
 
 In the End
 ==========
@@ -452,6 +677,8 @@ Reference
 - [AOSA LLVM](http://www.aosabook.org/en/llvm.html)
 - [LLVM Language Reference](http://llvm.org/docs/LangRef.html)
 - [Clang Compiler Users Manual](http://clang.llvm.org/docs/UsersManual.html)
+- [Static single assignment form](https://www.wikiwand.com/en/Static_single_assignment_form)
+- [LLVM's Analysis and Transform Passes](http://llvm.org/docs/Passes.html)
 
 
 
