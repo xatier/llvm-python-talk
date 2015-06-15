@@ -17,10 +17,27 @@ import llvmlite.binding
 #
 
 source = """
-a += 2
-b += 12
-b = a + 12
-b = a + b
+a += 1
+a *= 2
+a *= 2
+a *= 2
+a *= 2
+a *= 2
+
+b += 1
+b += a
+b -= a
+b *= a
+b /= a
+b += 1
+
+#b = a + b
+#a = a + b
+#b = a + b
+#a = a + b
+#b = a + b
+#a = a + b
+#b = a + b
 """
 
 # llvm type alias
@@ -45,7 +62,7 @@ def init():
     # llvm module
     module = llvmlite.ir.Module("mod")
 
-    # void fun (void)
+    # void func (void)
     func_ty = llvmlite.ir.FunctionType(void, ())
     func = llvmlite.ir.Function(module, func_ty, name='func')
 
@@ -139,11 +156,11 @@ def compile_(source):
 
             if isinstance(node.value.op, ast.Add):
                 op = "Add"
-            elif isinstance(node.value.left, ast.Sub):
+            elif isinstance(node.value.op, ast.Sub):
                 op = "Sub"
-            elif isinstance(node.value.left, ast.Mult):
+            elif isinstance(node.value.op, ast.Mult):
                 op = "Mult"
-            elif isinstance(node.value.left, ast.Div):
+            elif isinstance(node.value.op, ast.Div):
                 op = "Div"
 
             inst(builder, op, left, right, target)
