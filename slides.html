@@ -130,7 +130,7 @@ LLVM stuffs
 
 
 
-### xatier @PYHUG .red[Jun 15 2015]  ###
+### xatier @PYHUG .red[Jun 16 2015]  ###
 
 ---
 
@@ -486,7 +486,7 @@ class: center, middle
 # llvm IR features
 
 - typed
-- pesudo register
+- pseudo register
 - metadata
 - SSA form & phi node
 
@@ -495,7 +495,7 @@ class: center, middle
 # llvm IR features
 
 - typed
-- pesudo register
+- pseudo register
 - metadata
 ## SSA form & phi node
 
@@ -654,7 +654,31 @@ class: center, middle
 
 ---
 
-# a tiny ast +  llvmpy example
+# a tiny ast +  llvmlite example
+
+- (Basic) Python expressions
+- Python AST
+- LLVM IR
+- x86 JIT engine
+
+```
+# source code to LLVM module
+def compile_(source):
+
+    # Syntax directed translation!
+    tree = ast.parse(source)
+    for node in tree.body:
+        # AST nodes to three address code
+        # three address code to LLVM IR
+
+    dump_var(a, b)
+
+# main
+if __name__ == '__main__':
+    module = compile_(source)
+    # jit and run!
+```
+
 
 ## demo
 
@@ -663,6 +687,14 @@ class: center, middle
 
 In the End
 ==========
+
+- Compilation
+
+- LLVM IR
+
+- real LLVM engineers use C++ API
+
+    - ffi/ctypes hacks are not robust enough
 
 ---
 
